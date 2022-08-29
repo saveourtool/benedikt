@@ -1,4 +1,4 @@
-= A GitHub Action to check your code with https://github.com/saveourtool/diktat[_diKTat_]
+= Benedikt: a _GitHub Action_ to check your code with https://github.com/saveourtool/diktat[_diKTat_]
 :toc:
 :imagesdir: docs/images
 
@@ -6,16 +6,16 @@ image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="ht
 
 == Features
 
- * Customizable `diktat-analysis.yml` location. You can use the rule set
-   configuration with an alternate name or at a non-default location.
- * Customizable JVM vendor and version. You can run diKTat using a default JVM,
-   or you can set up your own.
- * Customizable reporters (_SARIF_, _JSON_, _Checkstyle_ XML).
- * Allows multiple input paths. If you have a multi-module project and only wish
-   to check certain directories or modules, you can configure the action
-   accordingly.
- * The last line of the log output reported to the summary page:
-   image:diktat-check-summary.png[diKTat Check summary]
+* Customizable `diktat-analysis.yml` location. You can use the rule set
+  configuration with an alternate name or at a non-default location.
+* Customizable JVM vendor and version. You can run _diKTat_ using a default JVM,
+  or you can set up your own one.
+* Customizable reporters (_SARIF_, _JSON_, _Checkstyle_ XML).
+* Allows multiple input paths. If you have a multi-module project and only wish
+  to check certain directories or modules, you can configure the action
+  accordingly.
+* The last line of the log output reported to the summary page:
+  image:check-summary.png[diKTat Check summary]
 
 == Usage
 
@@ -37,6 +37,212 @@ jobs:
 ----
 
 == Configuration
+
+=== `config`: custom configuration file
+
+* Default: `diktat-analysis.yml`
+* Required: **no**
+
+You can override the name or the path of your YAML configuration file using the
+`config` input parameter, e. g.:
+
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          config: path/to/diktat-analysis-custom.yml
+----
+
+=== `reporter`: requesting a custom reporter
+
+If you wish, you can report errors in a custom format.
+
+* Default: `sarif`
+* Required: **no**
+* Possible values: any of the following.
+
+** `sarif`: report errors in the
+https://github.com/microsoft/sarif-tutorials/blob/main/docs/1-Introduction.md#what-is-sarif[_SARIF_]
+format. The output file will be named `report.sarif` and automatically uploaded
+to _GitHub_ using the https://github.com/github/codeql-action/tree/v2/upload-sarif[`upload-sarif`]
+action. This will enable the check results to be shown as annotations in the
+pull request:
++
+image::sarif-reporting-pr.png[diKTat SARIF reporting (Pull Request)]
++
+as well as in the _Code scanning alerts_ section of your repository:
++
+image::sarif-reporting-code-scanning-alerts.png[diKTat SARIF reporting (Code scanning alerts)]
+
+** `checkstyle`: this is the reporter of choice if you ever encounter issues
+with the `sarif` reporter. Errors are reported in the
+https://github.com/checkstyle/checkstyle[_Checkstyle-XML_] format to the file
+named `checkstyle-report.xml`. The report is then consumed by the
+https://github.com/reviewdog/reviewdog[`reviewdog`] tool and uploaded to
+_GitHub_, resulting in code annotations similar to those produced by the `sarif`
+reporter:
++
+image::checkstyle-xml-reporting.png[Checkstyle-XML reporting assisted by reviewdog]
+
+** `plain`: report errors in the plain-text format, e. g.:
++
+[source]
+----
+C.kt:1:1: [MISSING_KDOC_TOP_LEVEL] all public and internal top-level classes and functions should have Kdoc: C (cannot be auto-corrected) (diktat-ruleset:kdoc-comments)
+C.kt:1:1: [FILE_NAME_INCORRECT] file name is incorrect - it should end with .kt extension and be in PascalCase: C.kt (diktat-ruleset:file-naming)
+C.kt:1:1: [PACKAGE_NAME_MISSING] no package name declared in a file: C.kt (diktat-ruleset:package-naming)
+C.kt:1:7: [CLASS_NAME_INCORRECT] class/enum/interface name should be in PascalCase and should contain only latin (ASCII) letters or numbers: C (diktat-ruleset:identifier-naming)
+C.kt:1:7: [IDENTIFIER_LENGTH] identifier's length is incorrect, it should be in range of [2, 64] symbols: C (cannot be auto-corrected) (diktat-ruleset:identifier-naming)
+----
++
+The errors, if any, are printed on the standard output.
+
+** `plain?group_by_file`: same as above, but group errors by file, e. g.:
++
+[source]
+----
+C.kt
+  1:1 [MISSING_KDOC_TOP_LEVEL] all public and internal top-level classes and functions should have Kdoc: C (cannot be auto-corrected)
+  1:1 [FILE_NAME_INCORRECT] file name is incorrect - it should end with .kt extension and be in PascalCase: C.kt
+  1:1 [PACKAGE_NAME_MISSING] no package name declared in a file: C.kt
+  1:7 [CLASS_NAME_INCORRECT] class/enum/interface name should be in PascalCase and should contain only latin (ASCII) letters or numbers: C
+  1:7 [IDENTIFIER_LENGTH] identifier's length is incorrect, it should be in range of [2, 64] symbols: C (cannot be auto-corrected)
+----
+
+** `json`: report errors in the JSON format to the file named `report.json`.
+
+** `html`: report errors in the HTML format to the file named `report.html`.
+
+=== `input-paths`: custom source sets
+
+* Default: none
+* Required: **no**
+
+One or more patterns which indicate the files or directories to check. Use a
+multiline string to specify multiple inputs.
+
+* If an input is a path to a file, it is passed to _diKTat_ as-is:
++
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          input-paths: |
+            path/to/file.kt
+----
+
+* If an input is a path to a directory, the directory is recursively traversed,
+and all `\*.kt` and `*.kts` files are passed to _diKTat_.
++
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          input-paths: |
+            src/main/kotlin
+            src/test/kotlin
+----
+* If an input is an https://ant.apache.org/manual/dirtasks.html#patterns[_Ant_-style
+path pattern] (such as `\\**/*.kt`), _diKTat_ expands it into the list of files
+that match the path pattern. Path patterns may be negated, e. g.:
+`!src/\**/*Test.kt` or `!src/\**/generated/**`.
++
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          input-paths: |
+            **/*.kt
+            **/*.kts
+            !**/generated/**
+----
+
+If this input parameter is not specified, this is equivalent to setting it to
+`.`, meaning _diKTat_ will check all `\*.kt` and `*.kts` files in the project
+directory unless configured otherwise.
+
+=== `java-distribution` and `java-version`: running _diKTat_ using a custom JVM
+
+It's possible to run _diKTat_ with a custom JVM using the
+https://github.com/actions/setup-java[`actions/setup-java`] action. The
+following input parameters may be specified:
+
+* `java-distribution`: the Java distribution, see the
+https://github.com/actions/setup-java/blob/main/README.md[list of supported
+distributions].
+
+** Default: `temurin`
+** Required: **no**
+
+* `java-version`: the Java version to set up. Takes a whole or semver Java
+version. See https://github.com/actions/setup-java/blob/main/README.md[examples
+of supported syntax].
+
+** Default: none
+** Required: **no**
+
+[NOTE]
+Setting just the `java-distribution` property in order to use a custom
+JDK is not sufficient: you'll need to set **both** `java-distribution` **and**
+`java-version`:
+
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          java-distribution: 'temurin'
+          java-version: 17
+----
+
+=== `fail-on-error`:
+
+* Default: `true`
+* Required: **no**
+
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          fail-on-error: true
+----
+
+=== `relative-paths`:
+
+* Default: `true`
+* Required: **no**
+
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          relative-paths: true
+----
+
+=== `color`:
+
+* Default: `true`
+* Required: **no**
+
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          color: true
+----
+
+=== `debug`: enabling debug logging
+
+* Default: `false`
+* Required: **no**
+
+Debug logging can be enabled by setting the `debug` input parameter to `true`:
+
+[source,yaml]
+----
+      - uses: saveourtool/benedikt@v1
+        with:
+          debug: true
+----
 
 == Outputs
 

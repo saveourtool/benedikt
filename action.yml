@@ -18,8 +18,8 @@ inputs:
     required: false
   reporter:
     description: >
-      The reporter to use, one of: "plain" (the default), "plain?group_by_file",
-      "json", "sarif", "checkstyle", "html".
+      The reporter to use, one of: "plain", "plain?group_by_file", "json",
+      "sarif" (the default), "checkstyle", "html".
     default: 'sarif'
     required: false
   input-paths:
