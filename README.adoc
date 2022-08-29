@@ -249,8 +249,8 @@ _SARIF_ mode, paths reported are always absolute.
 * Default: `true`
 * Required: **no**
 
-Enables the console output to be colorized. This is only useful if the
-xref:#reporter[reporter] is set to `plain` or `plain?group_by_file`:
+Setting this flag enables the console output to be colorized. This is only
+useful if the xref:#reporter[reporter] is set to `plain` or `plain?group_by_file`:
 
 [source,yaml]
 ----
@@ -340,4 +340,73 @@ the `java-distribution` and `java-version` input parameters)
 | 7
 | No source files to check were found
 | **Yes**
+|===
+
+[#diktat-cli]
+== Using the command-line client
+
+Alternatively, if you wish to run _diKTat_ locally (e. g.: as a _Vim_ plug-in),
+or you're using a different CI/CD server, you can try the command-line client.
+Its exit codes are xref:#exit-codes[the same] as those of the action.
+
+[#diktat-cli-features]
+=== Features
+
+* Written in _UNIX Shell_ (~500 lines of code)
+* BSD-compatible
+* Also works in Windows (_Git Bash_, _Cygwin_, or _MSys2_)
+* Automatically downloads `ktlint` and `diktat` far JARs
+* Accepts all essential `ktlint` command-line arguments
+
+[#diktat-cli-usage]
+=== Usage
+
+[source,bash]
+----
+diktat [OPTION]... [FILE]...
+----
+
+[#diktat-cli-options]
+=== Option summary
+
+[cols="1,3"]
+|===
+| Command-line switch | Meaning
+
+| `-c CONFIG`, `--config=CONFIG`
+| Specify the location of the YAML configuration file. By default,
+`diktat-analysis.yml` in the current directory is used.
+
+| `-r REPORTER`, `--reporter=REPORTER`
+| The reporter to use, one of: `plain` (the default), `plain?group_by_file`,
+`json`, `sarif`, `checkstyle`, `html`.
+
+| `-o OUTPUT`, `--output=OUTPUT`
+| Redirect the reporter output to a file. Use `-o -` to force using the standard
+output.
+
+| `--color`
+| Colorize the output.
+
+| `--relative`
+| Relativize file paths with respect to the working directory. By default,
+absolute file paths get reported.
+
+| `--no-download-progress`
+| Do not show the progress bar as the binaries get downloaded.
+
+| `-d`, `--debug`
+| Enable the debug output.
+
+| `-h`, `--help`
+| Display the help text and exit.
+
+| `-l`, `--license`
+| Display the license and exit.
+
+| `-v`, `--verbose`
+|Enable the verbose output.
+
+| `-V`, `--version`
+|Output version information and exit.
 |===
