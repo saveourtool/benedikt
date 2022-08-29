@@ -3,7 +3,7 @@ name: Create a new release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*'
         # Ignore simple tags which are just "aliases" used by the Marketplace.
       - '!v1'
       - '!v2'
