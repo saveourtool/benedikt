@@ -168,14 +168,14 @@ https://github.com/actions/setup-java[`actions/setup-java`] action. The
 following input parameters may be specified:
 
 * `java-distribution`: the Java distribution, see the
-https://github.com/actions/setup-java/blob/main/README.md[list of supported
-distributions].
+https://github.com/actions/setup-java/blob/main/README.md#supported-distributions[list
+of supported distributions].
 
 ** Default: `temurin`
 ** Required: **no**
 
 * `java-version`: the Java version to set up. Takes a whole or semver Java
-version. See https://github.com/actions/setup-java/blob/main/README.md[examples
+version. See https://github.com/actions/setup-java/blob/main/README.md#supported-version-syntax[examples
 of supported syntax].
 
 ** Default: none

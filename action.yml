@@ -40,8 +40,8 @@ inputs:
   java-distribution:
     description: >
       The Java distribution. See the list of supported distributions at
-      <https://github.com/actions/setup-java/blob/main/README.md>. The default
-      is "temurin".
+      <https://github.com/actions/setup-java/blob/main/README.md#supported-distributions>.
+      The default is "temurin".
 
       Note that setting just this property in order to use a custom JDK is not
       sufficient: please set "java-version", too.
@@ -51,7 +51,7 @@ inputs:
     description: >
       The Java version to set up. Takes a whole or semver Java version. See
       examples of supported syntax at
-      <https://github.com/actions/setup-java/blob/main/README.md>.
+      <https://github.com/actions/setup-java/blob/main/README.md#supported-version-syntax>.
     required: false
   color:
     description: >
