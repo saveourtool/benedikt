@@ -11,11 +11,30 @@ image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="ht
  * Customizable JVM vendor and version. You can run diKTat using a default JVM,
    or you can set up your own.
  * Customizable reporters (_SARIF_, _JSON_, _Checkstyle_ XML).
- * Allows multiple input paths. If you have a multi-module project an only wish
+ * Allows multiple input paths. If you have a multi-module project and only wish
    to check certain directories or modules, you can configure the action
    accordingly.
  * The last line of the log output reported to the summary page:
    image:diktat-check-summary.png[diKTat Check summary]
+
+== Usage
+
+In the simplest scenario, the action can be used without input parameters; you
+just need to check out your code first, using
+https://github.com/marketplace/actions/checkout[`actions/checkout`]:
+
+[source,yaml]
+----
+jobs:
+  diktat_check:
+    name: 'diKTat Check'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: saveourtool/benedikt@v1
+----
 
 == Configuration
 
