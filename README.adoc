@@ -6,16 +6,21 @@ image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="ht
 
 == Features
 
-* Customizable `diktat-analysis.yml` location. You can use the rule set
-  configuration with an alternate name or at a non-default location.
-* Customizable JVM vendor and version. You can run _diKTat_ using a default JVM,
-  or you can set up your own one.
-* Customizable reporters (_SARIF_, _JSON_, _Checkstyle_ XML).
-* Allows multiple input paths. If you have a multi-module project and only wish
-  to check certain directories or modules, you can configure the action
-  accordingly.
+* Customizable `diktat-analysis.yml` xref:#config[location]. You can use the
+rule set configuration with an alternate name or at a non-default location.
+
+* Customizable JVM xref:#java-setup[vendor and version]. You can run _diKTat_
+using a default JVM, or you can set up your own one.
+
+* Customizable xref:#reporter[reporters] (_SARIF_, _JSON_, _Checkstyle_ XML).
+
+* Allows multiple xref:#input-paths[input paths]. If you have a multi-module
+project and only wish to check certain directories or modules, you can configure
+the action accordingly.
+
 * The last line of the log output reported to the summary page:
-  image:check-summary.png[diKTat Check summary]
++
+image::check-summary.png[diKTat Check summary]
 
 == Usage
 
@@ -38,6 +43,7 @@ jobs:
 
 == Configuration
 
+[#config]
 === `config`: custom configuration file
 
 * Default: `diktat-analysis.yml`
@@ -53,6 +59,7 @@ You can override the name or the path of your YAML configuration file using the
           config: path/to/diktat-analysis-custom.yml
 ----
 
+[#reporter]
 === `reporter`: requesting a custom reporter
 
 If you wish, you can report errors in a custom format.
@@ -113,6 +120,7 @@ C.kt
 
 ** `html`: report errors in the HTML format to the file named `report.html`.
 
+[#input-paths]
 === `input-paths`: custom source sets
 
 * Default: none
@@ -161,6 +169,7 @@ If this input parameter is not specified, this is equivalent to setting it to
 `.`, meaning _diKTat_ will check all `\*.kt` and `*.kts` files in the project
 directory unless configured otherwise.
 
+[#java-setup]
 === `java-distribution` and `java-version`: running _diKTat_ using a custom JVM
 
 It's possible to run _diKTat_ with a custom JVM using the
@@ -194,10 +203,14 @@ JDK is not sufficient: you'll need to set **both** `java-distribution` **and**
           java-version: 17
 ----
 
-=== `fail-on-error`:
+=== `fail-on-error`: suppressing lint errors
 
 * Default: `true`
 * Required: **no**
+
+If `false`, the errors are still reported, but the step completes successfully.
+If `true` (the default), then lint errors reported by _diKTat_ are considered
+fatal (i.e. the current step terminates with a failure):
 
 [source,yaml]
 ----
@@ -206,10 +219,18 @@ JDK is not sufficient: you'll need to set **both** `java-distribution` **and**
           fail-on-error: true
 ----
 
-=== `relative-paths`:
+[NOTE]
+
+This flag only affects the case when _diKTat_ exits with code **1**. Higher
+xref:#exit-codes[exit codes] are _always_ fatal.
+
+=== `relative-paths`: relative or absolute paths
 
 * Default: `true`
 * Required: **no**
+
+If `true`, file paths get relativized with respect to the project directory.
+Otherwise, absolute file paths get reported. Example:
 
 [source,yaml]
 ----
@@ -218,15 +239,24 @@ JDK is not sufficient: you'll need to set **both** `java-distribution` **and**
           relative-paths: true
 ----
 
-=== `color`:
+[NOTE]
+
+When _SARIF_ xref:#reporter[reporter] is used, this flag has no effect: in
+_SARIF_ mode, paths reported are always absolute.
+
+=== `color`: colorizing the plain-text output
 
 * Default: `true`
 * Required: **no**
+
+Enables the console output to be colorized. This is only useful if the
+xref:#reporter[reporter] is set to `plain` or `plain?group_by_file`:
 
 [source,yaml]
 ----
       - uses: saveourtool/benedikt@v1
         with:
+          reporter: plain
           color: true
 ----
 
@@ -270,6 +300,7 @@ jobs:
 
 The exit codes are documented below.
 
+[#exit-codes]
 === Exit codes
 
 .Exit codes
@@ -282,7 +313,7 @@ The exit codes are documented below.
 | **No**
 
 | 1
-| _diKTat_ reported some warnings in your code
+| _diKTat_ reported some errors in your code
 | Depends on the `fail-on-error` input parameter, the default is **Yes**
 
 | 2
