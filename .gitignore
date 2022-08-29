@@ -1,4 +1,8 @@
 /bin/ktlint
 /bin/diktat-*.jar
+/bin/*.log
 /.idea/
 /#*#
+*~
+/README.html
+/README.pdf
