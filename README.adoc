@@ -1,3 +1,4 @@
-# A GitHub Action to check your code with [_diKTat_](https://github.com/saveourtool/diktat)
+= A GitHub Action to check your code with https://github.com/saveourtool/diktat[_diKTat_]
+:toc:
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="https://opensource.org/licenses/MIT"]
