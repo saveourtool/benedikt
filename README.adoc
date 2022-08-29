@@ -18,3 +18,70 @@ image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="ht
    image:diktat-check-summary.png[diKTat Check summary]
 
 == Configuration
+
+== Outputs
+
+The action returns the exit code of the command-line client using the
+`exit-code` output parameter, e. g.:
+
+[source,yaml]
+----
+jobs:
+  diktat_check:
+    name: 'diKTat Check'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: diktat
+        uses: saveourtool/benedikt@v1
+
+      - name: 'Read the exit code of diKTat'
+        if: ${{ always() }}
+        run: echo "diKTat exited with code ${{ steps.diktat.outputs.exit-code }}"
+        shell: bash
+----
+
+The exit codes are documented below.
+
+=== Exit codes
+
+.Exit codes
+[cols="1,3,1"]
+|===
+| Exit code | Meaning | Treated as a failure
+
+| 0
+| _diKTat_ found no errors in your code
+| **No**
+
+| 1
+| _diKTat_ reported some warnings in your code
+| Depends on the `fail-on-error` input parameter, the default is **Yes**
+
+| 2
+| The JVM was not found (probably, you need to set up the JVM explicitly, using
+the `java-distribution` and `java-version` input parameters)
+| **Yes**
+
+| 3
+| Failure while downloading dependencies
+| **Yes**
+
+| 4
+| Unsupported command-line switch
+| **Yes**
+
+| 5
+| _diKTat_ JAR was not found
+| **Yes**
+
+| 6
+| A command-line switch requires an argument
+| **Yes**
+
+| 7
+| No source files to check were found
+| **Yes**
+|===
