@@ -1,4 +1,20 @@
 = A GitHub Action to check your code with https://github.com/saveourtool/diktat[_diKTat_]
 :toc:
+:imagesdir: docs/images
 
 image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="https://opensource.org/licenses/MIT"]
+
+== Features
+
+ * Customizable `diktat-analysis.yml` location. You can use the rule set
+   configuration with an alternate name or at a non-default location.
+ * Customizable JVM vendor and version. You can run diKTat using a default JVM,
+   or you can set up your own.
+ * Customizable reporters (_SARIF_, _JSON_, _Checkstyle_ XML).
+ * Allows multiple input paths. If you have a multi-module project an only wish
+   to check certain directories or modules, you can configure the action
+   accordingly.
+ * The last line of the log output reported to the summary page:
+   image:diktat-check-summary.png[diKTat Check summary]
+
+== Configuration
