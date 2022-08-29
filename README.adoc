@@ -2,7 +2,23 @@
 :toc:
 :imagesdir: docs/images
 
+[.float-group]
+--
+[.left]
 image::https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT,link="https://opensource.org/licenses/MIT"]
+
+[.left]
+image::https://badgen.net/github/release/saveourtool/benedikt/latest?color=green[GitHub release,link=https://github.com/saveourtool/benedikt/releases/latest]
+
+[.left]
+image::https://badgen.net/badge/icon/Ubuntu?icon=terminal&label&color=green[Ubuntu Linux]
+
+[.left]
+image::https://badgen.net/badge/icon/macOS?icon=apple&label&color=green[macOS]
+
+[.left]
+image::https://badgen.net/badge/icon/Windows?icon=windows&label&color=green[Windows]
+--
 
 == Features
 
