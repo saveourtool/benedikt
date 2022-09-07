@@ -29,6 +29,7 @@ jobs:
       - run: |
           tar cf 'diktat-cli-${{ env.RELEASE_VERSION }}.tar' -C bin diktat
           gzip -9 'diktat-cli-${{ env.RELEASE_VERSION }}.tar'
+          zip -jrX9 -Z bzip2 'diktat-cli-${{ env.RELEASE_VERSION }}.zip' bin
         shell: bash
 
       - id: create_release
@@ -41,7 +42,8 @@ jobs:
           draft: false
           prerelease: false
 
-      - id: upload-release-asset
+      - name: Upload Release Asset (.tar.gz)
+        id: upload-release-asset-tar-gz
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,3 +52,14 @@ jobs:
           asset_path: diktat-cli-${{ env.RELEASE_VERSION }}.tar.gz
           asset_name: diktat-cli-${{ env.RELEASE_VERSION }}.tar.gz
           asset_content_type: application/gzip
+
+      - name: Upload Release Asset (.zip)
+        id: upload-release-asset-zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: diktat-cli-${{ env.RELEASE_VERSION }}.zip
+          asset_name: diktat-cli-${{ env.RELEASE_VERSION }}.zip
+          asset_content_type: application/zip
