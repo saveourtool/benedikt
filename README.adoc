@@ -1,4 +1,4 @@
-= Benedikt: a _GitHub Action_ to check your code with https://github.com/saveourtool/diktat[_diKTat_]
+= A _GitHub Action_ to check your code with https://github.com/saveourtool/diktat[_diKTat_]
 :toc:
 :imagesdir: docs/images
 
