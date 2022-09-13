@@ -18,6 +18,7 @@ IFS=$'\n'
 declare -i COLOR=0
 declare -i DEBUG=0
 declare -i DOWNLOAD_PROGRESS=1
+declare -i FORMAT_MODE=0
 declare -i RELATIVE_PATHS=0
 declare -i VERBOSE=0
 declare -i VERSION_REQUESTED=0
@@ -70,6 +71,7 @@ Usage: $(basename "$0") [OPTION]... [FILE]...
  -c CONFIG, --config=CONFIG Specify the location of the YAML configuration file.
                             By default, ${DEFAULT_CONFIG_FILE} in the current
                             directory is used.
+ -F, --format               Fix any deviations from the code style.
  -r REPORTER, --reporter=REPORTER
                             The reporter to use, one of:
                              * "plain" (the default),
@@ -240,7 +242,7 @@ function download_from_github() {
 # Finds the newest regular file which matches the wildcard.
 function find_diktat_jar() {
     find "${LIB_DIR}" -type f -name "${DIKTAT_JAR_WILDCARD}" -print0 | \
-        xargs -0 -n1 -r ls -1t | \
+        xargs -0 -r ls -1t 2>/dev/null | \
         head -n1
 }
 
@@ -397,6 +399,10 @@ do
             DEBUG=1
             shift
             ;;
+        '-F' | '--format')
+            FORMAT_MODE=1
+            shift
+            ;;
         '-h' | '--help')
             usage
             exit
@@ -514,6 +520,10 @@ fi
 if (( COLOR == 1 ))
 then
     KTLINT_ARGS+=('--color')
+fi
+if (( FORMAT_MODE == 1 ))
+then
+    KTLINT_ARGS+=('--format')
 fi
 # Enable relative paths if requested, except when in SARIF-reporting mode.
 # See <https://github.com/pinterest/ktlint/issues/1608>.
