@@ -65,13 +65,9 @@ declare -r LOG_DIR="${BIN_DIR}"
 declare -r CURL='curl'
 declare -r CURL_FLAGS=('-SL')
 declare -r DIKTAT_JAR_WILDCARD='diktat-*.jar'
-declare -r DIKTAT_VERSION_TAG='v1.2.3'
+declare -r DIKTAT_VERSION_TAG='v1.2.4'
 declare -r KTLINT_EXECUTABLE='ktlint'
-# We stick to version 0.46.1 because of
-# https://github.com/pinterest/ktlint/issues/1599,
-# https://github.com/pinterest/ktlint/issues/1600, and
-# https://github.com/pinterest/ktlint/issues/1601.
-declare -r KTLINT_VERSION_TAG='0.46.1'
+declare -r KTLINT_VERSION_TAG='0.47.1'
 declare -r VERSION_LATEST='latest'
 
 # Global variables.
