@@ -120,9 +120,9 @@ runs:
         IFS=$'\n'
         INPUT_PATHS=(${{ inputs.input-paths }})
         { diktat --no-download-progress --verbose "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
-        echo "::set-output name=summary-line::$(tail -n1 diktat.log 2>/dev/null)"
+        echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
         rm -f diktat.log
-        echo "::set-output name=exit-code::${exit_code}"
+        echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
       env:
         GITHUB_TOKEN: ${{ github.token }}
       shell: bash
