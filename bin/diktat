@@ -31,7 +31,13 @@ declare -r LOG_DIR="${BIN_DIR}"
 declare -r CURL='curl'
 declare -r CURL_FLAGS=('-SL')
 declare -r DIKTAT_JAR_WILDCARD='diktat-*.jar'
+declare -r DIKTAT_VERSION_TAG='v1.2.3'
 declare -r KTLINT_EXECUTABLE='ktlint'
+# We stick to version 0.46.1 because of
+# https://github.com/pinterest/ktlint/issues/1599,
+# https://github.com/pinterest/ktlint/issues/1600, and
+# https://github.com/pinterest/ktlint/issues/1601.
+declare -r KTLINT_VERSION_TAG='0.46.1'
 declare -r VERSION_LATEST='latest'
 
 # Global variables.
@@ -454,17 +460,13 @@ find_java
 
 if [[ ! -x "${LIB_DIR}/${KTLINT_EXECUTABLE}" ]]
 then
-    # We stick to version 0.46.1 because of
-    # https://github.com/pinterest/ktlint/issues/1599,
-    # https://github.com/pinterest/ktlint/issues/1600, and
-    # https://github.com/pinterest/ktlint/issues/1601.
-    download_from_github "pinterest/ktlint" "0.46.1"
+    download_from_github 'pinterest/ktlint' "${KTLINT_VERSION_TAG}"
     chmod 755 "${LIB_DIR}/${KTLINT_EXECUTABLE}"
 fi
 
 if [[ -z "$(find_diktat_jar)" ]]
 then
-    download_from_github "saveourtool/diktat"
+    download_from_github 'saveourtool/diktat' "${DIKTAT_VERSION_TAG}"
 fi
 
 DIKTAT_JAR="$(find_diktat_jar)"
