@@ -104,4 +104,8 @@ the `java-distribution` and `java-version` input parameters)
 | 7
 | No source files to check were found
 | **Yes**
+
+| 8
+| Incompatible _Bash_ version
+| **Yes**
 |===

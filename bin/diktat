@@ -14,6 +14,40 @@ set -euo pipefail
 OLD_IFS="${IFS}"
 IFS=$'\n'
 
+function error() {
+    local message
+    message="$*"
+
+    if [[ "${GITHUB_ACTIONS:=false}" == 'true' ]]
+    then
+        # Echoing to GitHub.
+        echo "::error::${message}"
+    elif [[ -t 1 ]]
+    then
+        # Echoing to a terminal.
+        echo -e "\e[1m$(basename "$0"): \e[31merror:\e[0m ${message}" >&2
+    else
+        # Echoing to a pipe.
+        echo "$(basename "$0"): error: ${message}" >&2
+    fi
+}
+
+# Exit codes.
+# The code of 1 is returned by ktlint in the event of failure.
+declare -ir ERROR_JAVA_NOT_FOUND=2
+declare -ir ERROR_DOWNLOAD_FAILURE=3
+declare -ir ERROR_UNSUPPORTED_FLAG=4
+declare -ir ERROR_DIKTAT_JAR_NOT_FOUND=5
+declare -ir ERROR_OPTION_REQUIRES_ARGUMENT=6
+declare -ir ERROR_NO_INPUT_FILES_FOUND=7
+declare -ir ERROR_INCOMPATIBLE_BASH_VERSION=8
+
+if (( BASH_VERSINFO[0] < 4 ))
+then
+    error "bash version ${BASH_VERSION} is too old, version 4+ is required"
+    exit ${ERROR_INCOMPATIBLE_BASH_VERSION}
+fi
+
 # Default flag values.
 declare -i COLOR=0
 declare -i DEBUG=0
@@ -56,15 +90,6 @@ declare -r OPTION_REPORTER_SHORT='-r'
 declare -r OPTION_REPORTER_LONG='--reporter'
 declare -r OPTION_OUTPUT_SHORT='-o'
 declare -r OPTION_OUTPUT_LONG='--output'
-
-# Exit codes.
-# The code of 1 is returned by ktlint in the event of failure.
-declare -ir ERROR_JAVA_NOT_FOUND=2
-declare -ir ERROR_DOWNLOAD_FAILURE=3
-declare -ir ERROR_UNSUPPORTED_FLAG=4
-declare -ir ERROR_DIKTAT_JAR_NOT_FOUND=5
-declare -ir ERROR_OPTION_REQUIRES_ARGUMENT=6
-declare -ir ERROR_NO_INPUT_FILES_FOUND=7
 
 # Error messages.
 declare -r MESSAGE_UNSUPPORTED_FLAG='unsupported flag'
@@ -124,24 +149,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 EOF
-}
-
-function error() {
-    local message
-    message="$*"
-
-    if [[ "${GITHUB_ACTIONS:=false}" == 'true' ]]
-    then
-        # Echoing to GitHub.
-        echo "::error::${message}"
-    elif [[ -t 1 ]]
-    then
-        # Echoing to a terminal.
-        echo -e "\e[1m$(basename "$0"): \e[31merror:\e[0m ${message}" >&2
-    else
-        # Echoing to a pipe.
-        echo "$(basename "$0"): error: ${message}" >&2
-    fi
 }
 
 # Locates Java, preferring JAVA_HOME.
