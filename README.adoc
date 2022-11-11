@@ -245,7 +245,7 @@ fatal (i.e. the current step terminates with a failure):
 [NOTE]
 
 This flag only affects the case when _diKTat_ exits with code **1**. Higher
-link:https://saveourtool.github.io/benedikt/docs/diktat-cli.adoc#exit-codes[exit
+link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html#exit-codes[exit
 codes] are _always_ fatal.
 
 === `relative-paths`: relative or absolute paths
@@ -323,11 +323,11 @@ jobs:
 ----
 
 The exit codes are documented
-link:https://saveourtool.github.io/benedikt/docs/diktat-cli.adoc#exit-codes[here].
+link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html#exit-codes[here].
 
 [#diktat-cli]
 == Using the command-line client
 
 Alternatively, if you wish to run _diKTat_ locally (e. g.: as a _Vim_ plug-in),
 or you're using a different CI/CD server, you can try the
-link:https://saveourtool.github.io/benedikt/docs/diktat-cli.adoc[command-line client].
+link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html[command-line client].
