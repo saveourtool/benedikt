@@ -19,13 +19,17 @@ on:
 
 jobs:
   bindist-thin:
+    name: Binary distribution (thin)
     uses: ./.github/workflows/bindist-thin.yml
     secrets: inherit
 
   bindist-full:
+    name: Binary distribution (full)
     uses: ./.github/workflows/bindist-full.yml
     secrets: inherit
 
   move-tag:
+    name: Move the Marketplace tag
+    needs: [bindist-thin, bindist-full]
     uses: ./.github/workflows/move-marketplace-tag.yml
     secrets: inherit
