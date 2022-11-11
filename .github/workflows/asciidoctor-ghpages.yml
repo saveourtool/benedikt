@@ -25,5 +25,6 @@ jobs:
           # adoc_file_ext: .ascii # default is .adoc
           # source_dir: docs/ # default is .
           # slides_build: true
-          # pre_build:
+          pre_build: |
+            git rm -rf -- .idea/ bin/ .editorconfig .gitignore .gitattributes CODE_OF_CONDUCT.md LICENSE *.yml
           # post_build:
