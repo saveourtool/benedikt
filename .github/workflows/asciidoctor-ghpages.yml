@@ -21,6 +21,7 @@ jobs:
         with:
           pdf_build: true
           # asciidoctor_params: --attribute=nofooter
+          asciidoctor_params: --attribute=allow-uri-read
           # adoc_file_ext: .ascii # default is .adoc
           # source_dir: docs/ # default is .
           # slides_build: true
