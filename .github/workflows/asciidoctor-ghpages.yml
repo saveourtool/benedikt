@@ -14,6 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Remove irrelevant files
+        run: |
+          rm -rf .idea/ bin/ .editorconfig .gitignore .gitattributes CODE_OF_CONDUCT.md LICENSE *.yml
+        shell: bash
+
       # Includes the AsciiDoctor GitHub Pages Action to convert adoc files to
       # html and publish to gh-pages branch.
       - name: asciidoctor-ghpages

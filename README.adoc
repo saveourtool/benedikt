@@ -1,6 +1,7 @@
 = A _GitHub Action_ to check your code with https://github.com/saveourtool/diktat[_diKTat_]
 :toc:
 :imagesdir: docs/images
+:tip-caption: pass:[&#128161;]
 
 [.float-group]
 --
@@ -19,6 +20,12 @@ image::https://badgen.net/badge/icon/macOS?icon=apple&label&color=green[macOS]
 [.left]
 image::https://badgen.net/badge/icon/Windows?icon=windows&label&color=green[Windows]
 --
+
+[TIP]
+====
+An always updated version of this document is available
+link:https://saveourtool.github.io/benedikt/ebook.pdf[here] as a PDF e-book.
+====
 
 == Features
 
@@ -238,7 +245,7 @@ fatal (i.e. the current step terminates with a failure):
 [NOTE]
 
 This flag only affects the case when _diKTat_ exits with code **1**. Higher
-link:https://github.com/saveourtool/benedikt/tree/master/docs/diktat-cli.adoc#exit-codes[exit
+link:https://saveourtool.github.io/benedikt/docs/diktat-cli.adoc#exit-codes[exit
 codes] are _always_ fatal.
 
 === `relative-paths`: relative or absolute paths
@@ -316,11 +323,11 @@ jobs:
 ----
 
 The exit codes are documented
-link:https://github.com/saveourtool/benedikt/tree/master/docs/diktat-cli.adoc#exit-codes[here].
+link:https://saveourtool.github.io/benedikt/docs/diktat-cli.adoc#exit-codes[here].
 
 [#diktat-cli]
 == Using the command-line client
 
 Alternatively, if you wish to run _diKTat_ locally (e. g.: as a _Vim_ plug-in),
 or you're using a different CI/CD server, you can try the
-link:https://github.com/saveourtool/benedikt/tree/master/docs/diktat-cli.adoc[command-line client].
+link:https://saveourtool.github.io/benedikt/docs/diktat-cli.adoc[command-line client].
