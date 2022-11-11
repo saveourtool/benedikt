@@ -1,0 +1,12 @@
+name: Create a binary distribution (full)
+
+on:
+  workflow_call:
+
+jobs:
+  dist:
+    name: Binary distribution (full)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3

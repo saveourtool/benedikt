@@ -1,0 +1,12 @@
+name: Create a binary distribution (thin)
+
+on:
+  workflow_call:
+
+jobs:
+  dist:
+    name: Binary distribution (thin)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
