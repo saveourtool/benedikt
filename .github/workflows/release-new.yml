@@ -2,6 +2,7 @@ name: Create a new release (new)
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     tags:
       - 'v*.*'
@@ -18,13 +19,13 @@ on:
 
 jobs:
   bindist-thin:
-    uses: .github/workflows/bindist-thin.yml
+    uses: .github/workflows/bindist-thin.yml@unstable
     secrets: inherit
 
   bindist-full:
-    uses: .github/workflows/bindist-full.yml
+    uses: .github/workflows/bindist-full.yml@unstable
     secrets: inherit
 
   move-tag:
-    uses: .github/workflows/move-marketplace-tag.yml
+    uses: .github/workflows/move-marketplace-tag.yml@unstable
     secrets: inherit
