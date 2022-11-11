@@ -45,7 +45,7 @@ jobs:
 
   bindist-thin:
     name: Binary distribution (thin)
-    needs: [ version, bindist-thin ]
+    needs: [ version ]
     uses: ./.github/workflows/bindist-thin.yml
     secrets: inherit
 
