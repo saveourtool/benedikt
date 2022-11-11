@@ -19,13 +19,13 @@ on:
 
 jobs:
   bindist-thin:
-    uses: .github/workflows/bindist-thin.yml@unstable
+    uses: ./.github/workflows/bindist-thin.yml@unstable
     secrets: inherit
 
   bindist-full:
-    uses: .github/workflows/bindist-full.yml@unstable
+    uses: ./.github/workflows/bindist-full.yml@unstable
     secrets: inherit
 
   move-tag:
-    uses: .github/workflows/move-marketplace-tag.yml@unstable
+    uses: ./.github/workflows/move-marketplace-tag.yml@unstable
     secrets: inherit
