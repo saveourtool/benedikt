@@ -155,7 +155,7 @@ function find_java() {
     if [[ -n "${JAVA_HOME:=}" ]]
     then
         case "$(uname -s)" in
-            'MINGW32_NT-'* | 'MINGW64_NT-'*)
+            'MINGW32_NT-'* | 'MINGW64_NT-'* | 'MSYS_NT-'* )
                 JAVA_HOME="$(cygpath "${JAVA_HOME}")"
                 ;;
         esac
@@ -293,7 +293,7 @@ function default_output() {
 # On UNIX, just returns the 1st argument.
 function native_path() {
     case "$(uname -s)" in
-        'MINGW32_NT-'* | 'MINGW64_NT-'*)
+        'MINGW32_NT-'* | 'MINGW64_NT-'* | 'MSYS_NT-'* )
             cygpath --windows "$1"
             ;;
         *)
