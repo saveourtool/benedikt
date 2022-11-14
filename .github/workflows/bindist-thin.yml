@@ -16,13 +16,15 @@ jobs:
       - uses: actions/checkout@v3
 
       - id: filenames
+        name: Archive names
         run: |
           echo "diktat-cli-tar=diktat-cli-${{ inputs.release-version }}.tar"    >>"${GITHUB_OUTPUT}"
           echo "diktat-cli-tgz=diktat-cli-${{ inputs.release-version }}.tar.gz" >>"${GITHUB_OUTPUT}"
           echo "diktat-cli-zip=diktat-cli-${{ inputs.release-version }}.zip"    >>"${GITHUB_OUTPUT}"
         shell: bash
 
-      - run: |
+      - name: Archive
+        run: |
           tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' --exclude-backups --exclude-vcs --exclude-vcs-ignore --exclude='*.bat' --exclude='*.cmd' -C bin diktat
           gzip -9 '${{ steps.filenames.outputs.diktat-cli-tar }}'
           zip -jrX9 -Z bzip2 '${{ steps.filenames.outputs.diktat-cli-zip }}' bin
@@ -47,3 +49,38 @@ jobs:
           path: ${{ steps.filenames.outputs.diktat-cli-zip }}
           if-no-files-found: error
           retention-days: 1
+
+      - id: create_release
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: v${{ inputs.release-version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset (${{ steps.filenames.outputs.diktat-cli-tgz }})
+        id: upload-release-asset-tgz
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.filenames.outputs.diktat-cli-tgz }}
+          asset_name: ${{ steps.filenames.outputs.diktat-cli-tgz }}
+          asset_content_type: application/gzip
+
+      - name: Upload Release Asset (${{ steps.filenames.outputs.diktat-cli-zip }})
+        id: upload-release-asset-zip
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.filenames.outputs.diktat-cli-zip }}
+          asset_name: ${{ steps.filenames.outputs.diktat-cli-zip }}
+          asset_content_type: application/zip
