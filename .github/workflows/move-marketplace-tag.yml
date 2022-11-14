@@ -6,7 +6,8 @@ on:
 jobs:
   dist:
     name: Move the Marketplace tag
-    if: github.ref_type == 'branch'
+    # See https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
 
     steps:
