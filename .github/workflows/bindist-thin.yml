@@ -23,7 +23,7 @@ jobs:
         shell: bash
 
       - run: |
-          tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' -C bin diktat
+          tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' --exclude-backups --exclude-vcs --exclude-vcs-ignore --exclude='*.bat' --exclude='*.cmd' -C bin diktat
           gzip -9 '${{ steps.filenames.outputs.diktat-cli-tar }}'
           zip -jrX9 -Z bzip2 '${{ steps.filenames.outputs.diktat-cli-zip }}' bin
         shell: bash
@@ -35,6 +35,7 @@ jobs:
         with:
           name: ${{ steps.filenames.outputs.diktat-cli-tgz }}
           path: ${{ steps.filenames.outputs.diktat-cli-tgz }}
+          if-no-files-found: error
           retention-days: 1
 
         # Upload a .zip artifact, except when this is a release.
@@ -44,4 +45,5 @@ jobs:
         with:
           name: ${{ steps.filenames.outputs.diktat-cli-zip }}
           path: ${{ steps.filenames.outputs.diktat-cli-zip }}
+          if-no-files-found: error
           retention-days: 1

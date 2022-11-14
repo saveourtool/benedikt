@@ -22,8 +22,14 @@ jobs:
           echo "diktat-cli-zip=diktat-cli-${{ inputs.release-version }}-full.zip"    >>"${GITHUB_OUTPUT}"
         shell: bash
 
+      - uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+
       - run: |
-          tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' -C bin diktat
+          bin/diktat -V
+          tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' --exclude-backups --exclude-vcs --exclude-vcs-ignore --exclude='*.bat' --exclude='*.cmd' -C bin .
           gzip -9 '${{ steps.filenames.outputs.diktat-cli-tar }}'
           zip -jrX9 -Z bzip2 '${{ steps.filenames.outputs.diktat-cli-zip }}' bin
         shell: bash
@@ -35,6 +41,7 @@ jobs:
         with:
           name: ${{ steps.filenames.outputs.diktat-cli-tgz }}
           path: ${{ steps.filenames.outputs.diktat-cli-tgz }}
+          if-no-files-found: error
           retention-days: 1
 
         # Upload a .zip artifact, except when this is a release.
@@ -44,4 +51,5 @@ jobs:
         with:
           name: ${{ steps.filenames.outputs.diktat-cli-zip }}
           path: ${{ steps.filenames.outputs.diktat-cli-zip }}
+          if-no-files-found: error
           retention-days: 1
