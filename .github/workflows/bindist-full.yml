@@ -73,7 +73,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset (${{ steps.filenames.outputs.diktat-cli-tgz }})
+      - name: Upload release asset (${{ steps.filenames.outputs.diktat-cli-tgz }})
         id: upload-release-asset-tgz
         if: ${{ github.ref_type == 'tag' }}
         uses: actions/upload-release-asset@v1
@@ -85,7 +85,7 @@ jobs:
           asset_name: ${{ steps.filenames.outputs.diktat-cli-tgz }}
           asset_content_type: application/gzip
 
-      - name: Upload Release Asset (${{ steps.filenames.outputs.diktat-cli-zip }})
+      - name: Upload release asset (${{ steps.filenames.outputs.diktat-cli-zip }})
         id: upload-release-asset-zip
         if: ${{ github.ref_type == 'tag' }}
         uses: actions/upload-release-asset@v1
