@@ -28,10 +28,12 @@ jobs:
           java-version: 17
 
       - run: |
-          bin/diktat -V
+          bin/diktat --no-download-progress -V
           tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' --exclude-backups --exclude-vcs --exclude-vcs-ignore --exclude='*.bat' --exclude='*.cmd' -C bin .
           gzip -9 '${{ steps.filenames.outputs.diktat-cli-tar }}'
           zip -jrX9 -Z bzip2 '${{ steps.filenames.outputs.diktat-cli-zip }}' bin
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
 
         # Upload a .tar.gz artifact, except when this is a release.
