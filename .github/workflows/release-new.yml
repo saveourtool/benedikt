@@ -45,16 +45,22 @@ jobs:
     name: Binary distribution (thin)
     needs: [ version ]
     uses: ./.github/workflows/bindist-thin.yml
+    with:
+      release-version: ${{ env.RELEASE_VERSION }}
     secrets: inherit
 
   bindist-full:
     name: Binary distribution (full)
     needs: [ version, bindist-thin ]
     uses: ./.github/workflows/bindist-full.yml
+    with:
+      release-version: ${{ env.RELEASE_VERSION }}
     secrets: inherit
 
   move-tag:
     name: Move the Marketplace tag
     needs: [ version, bindist-thin, bindist-full ]
     uses: ./.github/workflows/move-marketplace-tag.yml
+    with:
+      release-version: ${{ env.RELEASE_VERSION }}
     secrets: inherit
