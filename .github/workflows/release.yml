@@ -37,8 +37,22 @@ jobs:
 
           echo "release-version=${RELEASE_VERSION}" >>"${GITHUB_OUTPUT}"
         shell: bash
+
+      - id: release
+        name: Create the release
+        if: ${{ github.ref_type == 'tag' }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: v${{ steps.version.outputs.release-version }}
+          draft: false
+          prerelease: false
+
     outputs:
       release-version: ${{ steps.version.outputs.release-version }}
+      upload-url: ${{ steps.release.outputs.upload_url }}
 
   bindist-thin:
     name: Binary distribution (thin)
@@ -46,6 +60,7 @@ jobs:
     uses: ./.github/workflows/bindist-thin.yml
     with:
       release-version: ${{ needs.version.outputs.release-version }}
+      upload-url: ${{ needs.version.outputs.upload-url }}
     secrets: inherit
 
   bindist-full:
@@ -54,6 +69,7 @@ jobs:
     uses: ./.github/workflows/bindist-full.yml
     with:
       release-version: ${{ needs.version.outputs.release-version }}
+      upload-url: ${{ needs.version.outputs.upload-url }}
     secrets: inherit
 
   move-tag:

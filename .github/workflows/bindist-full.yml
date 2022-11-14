@@ -6,6 +6,9 @@ on:
       release-version:
         required: true
         type: string
+      upload-url:
+        required: true
+        type: string
 
 jobs:
   dist:
@@ -62,17 +65,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - id: create_release
-        if: ${{ github.ref_type == 'tag' }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: v${{ inputs.release-version }}
-          draft: false
-          prerelease: false
-
       - name: Upload release asset (${{ steps.filenames.outputs.diktat-cli-tgz }})
         id: upload-release-asset-tgz
         if: ${{ github.ref_type == 'tag' }}
@@ -80,7 +72,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ inputs.upload-url }}
           asset_path: ${{ steps.filenames.outputs.diktat-cli-tgz }}
           asset_name: ${{ steps.filenames.outputs.diktat-cli-tgz }}
           asset_content_type: application/gzip
@@ -92,7 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ inputs.upload-url }}
           asset_path: ${{ steps.filenames.outputs.diktat-cli-zip }}
           asset_name: ${{ steps.filenames.outputs.diktat-cli-zip }}
           asset_content_type: application/zip
