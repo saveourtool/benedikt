@@ -15,6 +15,33 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: |
-          echo "RELEASE_VERSION=${{ inputs.release-version }}"
+      - id: filenames
+        run: |
+          echo "diktat-cli-tar=diktat-cli-${{ inputs.release-version }}-full.tar"    >>"${GITHUB_OUTPUT}"
+          echo "diktat-cli-tgz=diktat-cli-${{ inputs.release-version }}-full.tar.gz" >>"${GITHUB_OUTPUT}"
+          echo "diktat-cli-zip=diktat-cli-${{ inputs.release-version }}-full.zip"    >>"${GITHUB_OUTPUT}"
         shell: bash
+
+      - run: |
+          tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' -C bin diktat
+          gzip -9 '${{ steps.filenames.outputs.diktat-cli-tar }}'
+          zip -jrX9 -Z bzip2 '${{ steps.filenames.outputs.diktat-cli-zip }}' bin
+        shell: bash
+
+        # Upload a .tar.gz artifact, except when this is a release.
+      - name: Upload ${{ steps.filenames.outputs.diktat-cli-tgz }}
+        if: ${{ github.ref_type == 'branch' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.filenames.outputs.diktat-cli-tgz }}
+          path: ${{ steps.filenames.outputs.diktat-cli-tgz }}
+          retention-days: 1
+
+        # Upload a .zip artifact, except when this is a release.
+      - name: Upload ${{ steps.filenames.outputs.diktat-cli-zip }}
+        if: ${{ github.ref_type == 'branch' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.filenames.outputs.diktat-cli-zip }}
+          path: ${{ steps.filenames.outputs.diktat-cli-zip }}
+          retention-days: 1
