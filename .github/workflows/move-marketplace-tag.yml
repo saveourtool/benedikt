@@ -6,7 +6,7 @@ on:
 jobs:
   dist:
     name: Move the Marketplace tag
-    if: ${{ env.GITHUB_REF_TYPE == 'branch' }}
+    if: github.ref_type == 'branch'
     runs-on: ubuntu-latest
 
     steps:
