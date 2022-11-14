@@ -1,10 +1,12 @@
 name: Create a new release
 
 on:
+  workflow_dispatch:
+  pull_request:
   push:
     tags:
       - 'v*.*'
-        # Ignore simple tags which are just "aliases" used by the Marketplace.
+      # Ignore simple tags which are just "aliases" used by the Marketplace.
       - '!v1'
       - '!v2'
       - '!v3'
@@ -16,51 +18,48 @@ on:
       - '!v9'
 
 jobs:
-  build:
-    name: Release
+  version:
+    name: Calculate the release version
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
-      - run: |
-          echo "RELEASE_VERSION=${GITHUB_REF#'refs/tags/v'}" >>"${GITHUB_ENV}"
+        # Infer the release version. Assumes that tags are named `vX.Y.Z`.
+      - id: version
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == 'branch' ]]
+          then
+            RELEASE_VERSION="${GITHUB_SHA}"
+          else
+            RELEASE_VERSION="${GITHUB_REF#'refs/tags/v'}"
+            RELEASE_VERSION="${RELEASE_VERSION//'/'/_}"
+          fi
+
+          echo "release-version=${RELEASE_VERSION}" >>"${GITHUB_OUTPUT}"
         shell: bash
+    outputs:
+      release-version: ${{ steps.version.outputs.release-version }}
 
-      - run: |
-          tar cf 'diktat-cli-${{ env.RELEASE_VERSION }}.tar' -C bin diktat
-          gzip -9 'diktat-cli-${{ env.RELEASE_VERSION }}.tar'
-          zip -jrX9 -Z bzip2 'diktat-cli-${{ env.RELEASE_VERSION }}.zip' bin
-        shell: bash
+  bindist-thin:
+    name: Binary distribution (thin)
+    needs: [ version ]
+    uses: ./.github/workflows/bindist-thin.yml
+    with:
+      release-version: ${{ needs.version.outputs.release-version }}
+    secrets: inherit
 
-      - id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: v${{ env.RELEASE_VERSION }}
-          draft: false
-          prerelease: false
+  bindist-full:
+    name: Binary distribution (full)
+    needs: [ version, bindist-thin ]
+    uses: ./.github/workflows/bindist-full.yml
+    with:
+      release-version: ${{ needs.version.outputs.release-version }}
+    secrets: inherit
 
-      - name: Upload Release Asset (.tar.gz)
-        id: upload-release-asset-tar-gz
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: diktat-cli-${{ env.RELEASE_VERSION }}.tar.gz
-          asset_name: diktat-cli-${{ env.RELEASE_VERSION }}.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload Release Asset (.zip)
-        id: upload-release-asset-zip
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: diktat-cli-${{ env.RELEASE_VERSION }}.zip
-          asset_name: diktat-cli-${{ env.RELEASE_VERSION }}.zip
-          asset_content_type: application/zip
+  move-tag:
+    name: Move the Marketplace tag
+    needs: [ version, bindist-thin, bindist-full ]
+    uses: ./.github/workflows/move-marketplace-tag.yml
+    with:
+      release-version: ${{ needs.version.outputs.release-version }}
+    secrets: inherit

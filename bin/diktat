@@ -172,6 +172,14 @@ function find_java() {
     fi
 }
 
+# Similar to `realpath`, which is by default missing on Mac OS X.
+function real_path() {
+    local file
+    file="$1"
+
+    echo "$(cd "$(dirname "${file}")"; pwd)/$(basename "${file}")"
+}
+
 # 1. Read the release descriptor
 # 2. Filter the download URLs
 # 3. Filter out any *.{asc,md5}
@@ -188,6 +196,11 @@ function find_java() {
 function download_from_github() {
     mkdir -p "${LIB_DIR}"
     mkdir -p "${LOG_DIR}"
+
+    # We'll be referencing `LOG_DIR` from within `LIB_DIR`.
+    # Make sure we use the absolute path.
+    local absolute_log_dir
+    absolute_log_dir="$(real_path "${LOG_DIR}")"
 
     # Make sure the downloaded binaries are in the same directory as the script and
     # do not pollute the directory of the project being checked.
@@ -211,7 +224,7 @@ function download_from_github() {
     local release_url
     release_url=$(printf "https://api.github.com/repos/%s/releases/%s\n" "${repository}" "${version}")
     local download_log
-    download_log="${LOG_DIR}/$(echo "${repository}" | tr '/' '-')-download.log"
+    download_log="${absolute_log_dir}/$(echo "${repository}" | tr '/' '-')-download.log"
 
     local progress
     if (( DOWNLOAD_PROGRESS == 1 ))
