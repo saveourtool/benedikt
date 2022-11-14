@@ -28,7 +28,7 @@ jobs:
           java-version: 17
 
       - run: |
-          bin/diktat --no-download-progress -V
+          bin/diktat --debug --no-download-progress -V
           tar cf '${{ steps.filenames.outputs.diktat-cli-tar }}' --exclude-backups --exclude-vcs --exclude-vcs-ignore --exclude='*.bat' --exclude='*.cmd' -C bin .
           gzip -9 '${{ steps.filenames.outputs.diktat-cli-tar }}'
           zip -jrX9 -Z bzip2 '${{ steps.filenames.outputs.diktat-cli-zip }}' bin
