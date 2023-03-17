@@ -65,9 +65,9 @@ declare -r LOG_DIR="${BIN_DIR}"
 declare -r CURL='curl'
 declare -r CURL_FLAGS=('-SL')
 declare -r DIKTAT_JAR_WILDCARD='diktat-*.jar'
-declare -r DIKTAT_VERSION_TAG='v1.2.4'
+declare -r DIKTAT_VERSION_TAG='v1.2.5'
 declare -r KTLINT_EXECUTABLE='ktlint'
-declare -r KTLINT_VERSION_TAG='0.47.1'
+declare -r KTLINT_VERSION_TAG='0.46.1'
 declare -r VERSION_LATEST='latest'
 
 # Global variables.
