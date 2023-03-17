@@ -502,6 +502,7 @@ JAVA_ARGS+=('-Xmx512m')
 JAVA_ARGS+=("-Duser.home=$(native_path "${PWD}")")
 JAVA_ARGS+=("-Ddiktat.config.path=$(native_path "${CONFIG_FILE}")")
 
+unset _JAVA_OPTIONS JAVA_TOOL_OPTIONS
 JAVA_VERSION=$("${JAVA}" -version 2>&1 | head -n1 | cut -d'"' -f2)
 JAVA_MAJOR_VERSION=$(echo "${JAVA_VERSION}" | sed 's/^1\.//' | cut -d'.' -f1)
 if (( JAVA_MAJOR_VERSION >= 17 ))
