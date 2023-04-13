@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaveourtool%2Fbenedikt.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaveourtool%2Fbenedikt?ref=badge_shield)
+
 = A _GitHub Action_ to check your code with https://github.com/saveourtool/diktat[_diKTat_]
 :toc:
 :imagesdir: docs/images
@@ -331,3 +333,7 @@ link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html#exit-codes[here
 Alternatively, if you wish to run _diKTat_ locally (e. g.: as a _Vim_ plug-in),
 or you're using a different CI/CD server, you can try the
 link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html[command-line client].
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaveourtool%2Fbenedikt.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaveourtool%2Fbenedikt?ref=badge_large)
