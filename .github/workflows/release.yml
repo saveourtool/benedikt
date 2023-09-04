@@ -22,7 +22,7 @@ jobs:
     name: Calculate the release version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
         # Infer the release version. Assumes that tags are named `vX.Y.Z`.
       - id: version
