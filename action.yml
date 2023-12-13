@@ -85,13 +85,17 @@ runs:
   steps:
     - id: setup-java
       if: ${{ inputs.java-version != null }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: '${{ inputs.java-distribution }}'
         java-version: ${{ inputs.java-version }}
 
-    - run: echo '${{ github.action_path }}/bin' >>${GITHUB_PATH}
-      shell: bash
+    - id: download-diktat
+      uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "nulls/diktat"
+        tag: "v2.0.0"
+        fileName: "diktat"
 
       # GitHub seems to set `-e` internally, so don't fail immediately if diKTat
       # returns a non-zero exit code but store the exit code in a variable for
@@ -101,8 +105,7 @@ runs:
       # `steps.diktat.outputs.exit-code` variable.
     - id: diktat
       run: |
-        DIKTAT_ARGS=('--config=${{ inputs.config }}')
-        DIKTAT_ARGS=('--reporter=${{ inputs.reporter }}')
+        DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
         if [[ '${{ inputs.color }}' != 'false' ]]
         then
           DIKTAT_ARGS+=('--color')
@@ -119,7 +122,7 @@ runs:
         set -o pipefail
         IFS=$'\n'
         INPUT_PATHS=(${{ inputs.input-paths }})
-        { diktat --no-download-progress --verbose "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
+        { diktat "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
         echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
