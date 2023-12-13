@@ -122,7 +122,7 @@ runs:
         set -o pipefail
         IFS=$'\n'
         INPUT_PATHS=(${{ inputs.input-paths }})
-        { diktat "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
+        { ${GITHUB_WORKSPACE}/diktat "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
         echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
