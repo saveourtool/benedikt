@@ -108,11 +108,11 @@ runs:
         DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
         if [[ '${{ inputs.color }}' != 'false' ]]
         then
-          DIKTAT_ARGS+=('--color')
+          DIKTAT_ARGS+=('--color-name')
         fi
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
-          DIKTAT_ARGS+=('--debug')
+          DIKTAT_ARGS+=('--log-level DEBUG')
         fi
         if [[ '${{ inputs.relative-paths }}' != 'false' ]]
         then
@@ -165,7 +165,7 @@ runs:
 
         if (( ${{ steps.diktat.outputs.exit-code }} <= 1 ))
         then
-          diktat --version | awk '{ split($0, versions, ": *"); print " - _" versions[1] "_: **" versions[2] "**" }' >>${GITHUB_STEP_SUMMARY}
+          ${GITHUB_WORKSPACE}/diktat --version | awk '{ split($0, versions, ": *"); print " - _" versions[1] "_: **" versions[2] "**" }' >>${GITHUB_STEP_SUMMARY}
         fi
 
         if (( ${{ steps.diktat.outputs.exit-code }} != 1 ))
