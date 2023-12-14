@@ -1,7 +1,3 @@
-/bin/ktlint
-/bin/diktat-*.jar
-/bin/*.log
-/bin/*.sarif
 /.idea/
 /#*#
 *~

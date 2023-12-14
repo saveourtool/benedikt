@@ -177,17 +177,6 @@ runs:
         fi
       shell: bash
 
-      # We only need this step to run if diKTat failed to download external
-      # files (3), and we need to publish the logs.
-    - uses: actions/upload-artifact@v3
-      if: ${{ failure() && steps.diktat.outputs.exit-code == 3 }}
-      with:
-        name: download-logs
-        path: |
-          ${{ github.action_path }}/bin/*-download.log
-        if-no-files-found: ignore
-        retention-days: 1
-
       # When in SARIF reporting mode, upload SARIF reports to GitHub.
     - id: upload-sarif
       if: ${{ always() && steps.diktat.outputs.exit-code == 1 && inputs.reporter == 'sarif' }}
