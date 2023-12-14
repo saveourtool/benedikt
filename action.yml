@@ -85,13 +85,17 @@ runs:
   steps:
     - id: setup-java
       if: ${{ inputs.java-version != null }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: '${{ inputs.java-distribution }}'
         java-version: ${{ inputs.java-version }}
 
-    - run: echo '${{ github.action_path }}/bin' >>${GITHUB_PATH}
-      shell: bash
+    - id: download-diktat
+      uses: robinraju/release-downloader@v1.8
+      with:
+        repository: "saveourtool/diktat"
+        tag: "v2.0.0"
+        fileName: "diktat"
 
       # GitHub seems to set `-e` internally, so don't fail immediately if diKTat
       # returns a non-zero exit code but store the exit code in a variable for
@@ -101,15 +105,14 @@ runs:
       # `steps.diktat.outputs.exit-code` variable.
     - id: diktat
       run: |
-        DIKTAT_ARGS=('--config=${{ inputs.config }}')
-        DIKTAT_ARGS=('--reporter=${{ inputs.reporter }}')
+        DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
         if [[ '${{ inputs.color }}' != 'false' ]]
         then
-          DIKTAT_ARGS+=('--color')
+          DIKTAT_ARGS+=('--color-name')
         fi
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
-          DIKTAT_ARGS+=('--debug')
+          DIKTAT_ARGS+=('--log-level DEBUG')
         fi
         if [[ '${{ inputs.relative-paths }}' != 'false' ]]
         then
@@ -119,7 +122,9 @@ runs:
         set -o pipefail
         IFS=$'\n'
         INPUT_PATHS=(${{ inputs.input-paths }})
-        { diktat --no-download-progress --verbose "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
+        DIKTAT_CMD=${GITHUB_WORKSPACE}/diktat
+        chmod +x ${DIKTAT_CMD}
+        { ${DIKTAT_CMD} "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
         echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
@@ -160,7 +165,7 @@ runs:
 
         if (( ${{ steps.diktat.outputs.exit-code }} <= 1 ))
         then
-          diktat --version | awk '{ split($0, versions, ": *"); print " - _" versions[1] "_: **" versions[2] "**" }' >>${GITHUB_STEP_SUMMARY}
+          ${GITHUB_WORKSPACE}/diktat --version | awk '{ split($0, versions, ": *"); print " - _" versions[1] "_: **" versions[2] "**" }' >>${GITHUB_STEP_SUMMARY}
         fi
 
         if (( ${{ steps.diktat.outputs.exit-code }} != 1 ))
@@ -171,17 +176,6 @@ runs:
           exit 1
         fi
       shell: bash
-
-      # We only need this step to run if diKTat failed to download external
-      # files (3), and we need to publish the logs.
-    - uses: actions/upload-artifact@v3
-      if: ${{ failure() && steps.diktat.outputs.exit-code == 3 }}
-      with:
-        name: download-logs
-        path: |
-          ${{ github.action_path }}/bin/*-download.log
-        if-no-files-found: ignore
-        retention-days: 1
 
       # When in SARIF reporting mode, upload SARIF reports to GitHub.
     - id: upload-sarif

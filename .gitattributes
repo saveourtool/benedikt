@@ -1,3 +1,2 @@
 *.bat		text	eol=crlf
 *.cmd		text	eol=crlf
-/bin/diktat	text	eol=lf		diff=bash

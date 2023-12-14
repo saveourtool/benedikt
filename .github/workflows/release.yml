@@ -22,7 +22,7 @@ jobs:
     name: Calculate the release version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
         # Infer the release version. Assumes that tags are named `vX.Y.Z`.
       - id: version
@@ -54,27 +54,9 @@ jobs:
       release-version: ${{ steps.version.outputs.release-version }}
       upload-url: ${{ steps.release.outputs.upload_url }}
 
-  bindist-thin:
-    name: Binary distribution (thin)
-    needs: [ version ]
-    uses: ./.github/workflows/bindist-thin.yml
-    with:
-      release-version: ${{ needs.version.outputs.release-version }}
-      upload-url: ${{ needs.version.outputs.upload-url }}
-    secrets: inherit
-
-  bindist-full:
-    name: Binary distribution (full)
-    needs: [ version, bindist-thin ]
-    uses: ./.github/workflows/bindist-full.yml
-    with:
-      release-version: ${{ needs.version.outputs.release-version }}
-      upload-url: ${{ needs.version.outputs.upload-url }}
-    secrets: inherit
-
   move-tag:
     name: Move the Marketplace tag
-    needs: [ version, bindist-thin, bindist-full ]
+    needs: [ version ]
     uses: ./.github/workflows/move-marketplace-tag.yml
     with:
       release-version: ${{ needs.version.outputs.release-version }}
