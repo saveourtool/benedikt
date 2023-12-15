@@ -18,8 +18,7 @@ inputs:
     required: false
   reporter:
     description: >
-      The reporter to use, one of: "plain", "plain?group_by_file", "json",
-      "sarif" (the default), "checkstyle", "html".
+      The reporter to use, one of: "sarif" (the default) or "checkstyle".
     default: 'sarif'
     required: false
   input-paths:
@@ -53,21 +52,10 @@ inputs:
       examples of supported syntax at
       <https://github.com/actions/setup-java/blob/main/README.md#supported-version-syntax>.
     required: false
-  color:
-    description: >
-      Colorize the output
-    default: ${{ true }}
-    required: false
   debug:
     description: >
       Whether debug logging should be enabled
     default: ${{ false }}
-    required: false
-  relative-paths:
-    description: >
-      Relativize file paths with respect to the working directory (if false,
-      absolute file paths get reported)
-    default: ${{ true }}
     required: false
   fail-on-error:
     description: >
@@ -83,6 +71,12 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - id: validate-inputs-reporter
+      if: ${{ inputs.reporter != 'sarif' && inputs.reporter != 'checkstyle' }}
+      run: |
+        echo "`reporter` should be set to `sarif` or `checkstyle`"
+        exit 1
+      shell: bash
     - id: setup-java
       if: ${{ inputs.java-version != null }}
       uses: actions/setup-java@v4
@@ -93,8 +87,8 @@ runs:
     - id: download-diktat
       uses: robinraju/release-downloader@v1.8
       with:
-        repository: "saveourtool/diktat"
-        tag: "v2.0.0"
+        repository: "nulls/diktat"
+        tag: "v2.0.1"
         fileName: "diktat"
 
       # GitHub seems to set `-e` internally, so don't fail immediately if diKTat
@@ -106,17 +100,9 @@ runs:
     - id: diktat
       run: |
         DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
-        if [[ '${{ inputs.color }}' != 'false' ]]
-        then
-          DIKTAT_ARGS+=('--color-name')
-        fi
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
           DIKTAT_ARGS+=('--log-level DEBUG')
-        fi
-        if [[ '${{ inputs.relative-paths }}' != 'false' ]]
-        then
-          DIKTAT_ARGS+=('--relative')
         fi
 
         set -o pipefail
