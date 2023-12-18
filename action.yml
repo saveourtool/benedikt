@@ -93,6 +93,7 @@ runs:
       # `steps.diktat.outputs.exit-code` variable.
     - id: diktat
       run: |
+        set -x
         DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
         if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
