@@ -108,7 +108,7 @@ runs:
           echo "`reporter` should be set to `sarif` or `checkstyle`"
           exit 1
         fi
-        DIKTAT_ARGS+=('--output' '${report_file}')
+        DIKTAT_ARGS+=('--output' "${report_file}")
 
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
