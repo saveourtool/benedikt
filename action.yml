@@ -100,10 +100,12 @@ runs:
         DIKTAT_ARGS=('--config' '${{ inputs.config }}' '--reporter' '${{ inputs.reporter }}')
         if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
-          DIKTAT_ARGS+=('--output' '${GITHUB_WORKSPACE}/report.sarif')
+          report_file=${GITHUB_WORKSPACE}/report.sarif
+          DIKTAT_ARGS+=('--output' report_file)
         elif [[ '${{ inputs.reporter }}' == 'checkstyle' ]]
         then
-          DIKTAT_ARGS+=('--output' '${GITHUB_WORKSPACE}/checkstyle-report.xml')
+          report_file=${GITHUB_WORKSPACE}/checkstyle-report.xml
+          DIKTAT_ARGS+=('--output' report_file)
         else
           echo "`reporter` should be set to `sarif` or `checkstyle`"
           exit 1
