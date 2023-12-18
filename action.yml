@@ -121,7 +121,8 @@ runs:
         { ${DIKTAT_CMD} "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
         total_lines=$(wc -l diktat.log | cut -d ' ' -f1)
         summary_line=$(grep -n 'Summary error count (descending) by rule:' diktat.log | cut -d: -f1)
-        echo "summary-line=$(tail -n $((total_lines - summary_line + 1)) diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
+#        echo "summary-line=$(tail -n $((total_lines - summary_line)) diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
+        echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
       env:
