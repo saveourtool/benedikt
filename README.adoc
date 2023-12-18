@@ -41,7 +41,7 @@ using a default JVM, or you can set up your own one.
 project and only wish to check certain directories or modules, you can configure
 the action accordingly.
 
-* The last line of the log output reported to the summary page:
+* The summary page contains statistic about detected errors:
 +
 image::check-summary.png[diKTat Check summary]
 
