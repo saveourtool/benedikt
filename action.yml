@@ -93,7 +93,10 @@ runs:
       # `steps.diktat.outputs.exit-code` variable.
     - id: diktat
       run: |
-        set -x
+        if [[ '${{ inputs.debug }}' == 'true' ]]
+        then
+          set -x
+        fi
         DIKTAT_ARGS=('--config' '${{ inputs.config }}' '--reporter' '${{ inputs.reporter }}')
         if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
@@ -116,7 +119,9 @@ runs:
         DIKTAT_CMD=${GITHUB_WORKSPACE}/diktat
         chmod +x ${DIKTAT_CMD}
         { ${DIKTAT_CMD} "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
-        echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
+        total_lines=$(wc -l diktat.log | cut -d ' ' -f1)
+        summary_line=$(grep -n 'Summary error count (descending) by rule:' diktat.log | cut -d: -f1)
+        echo "summary-line=$(tail -n $((total_lines - summary_line + 1)) diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
       env:
