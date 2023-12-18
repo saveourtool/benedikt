@@ -71,12 +71,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - id: validate-inputs-reporter
-      if: ${{ inputs.reporter != 'sarif' && inputs.reporter != 'checkstyle' }}
-      run: |
-        echo "`reporter` should be set to `sarif` or `checkstyle`"
-        exit 1
-      shell: bash
     - id: setup-java
       if: ${{ inputs.java-version != null }}
       uses: actions/setup-java@v4
@@ -88,7 +82,7 @@ runs:
       uses: robinraju/release-downloader@v1.8
       with:
         repository: "nulls/diktat"
-        tag: "v2.0.1"
+        tag: "v2.0.2"
         fileName: "diktat"
 
       # GitHub seems to set `-e` internally, so don't fail immediately if diKTat
@@ -100,6 +94,16 @@ runs:
     - id: diktat
       run: |
         DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
+        if [[ '${{ inputs.reporter }}' == 'sarif' ]]
+        then
+          DIKTAT_ARGS+=('--output report.sarif')
+        elif [[ '${{ inputs.reporter }}' == 'checkstyle' ]]
+        then
+          DIKTAT_ARGS+=('--output checkstyle-report.xml')
+        else
+          echo "`reporter` should be set to `sarif` or `checkstyle`"
+          exit 1
+        fi
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
           DIKTAT_ARGS+=('--log-level DEBUG')
