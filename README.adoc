@@ -35,7 +35,7 @@ rule set configuration with an alternate name or at a non-default location.
 * Customizable JVM xref:#java-setup[vendor and version]. You can run _diKTat_
 using a default JVM, or you can set up your own one.
 
-* Customizable xref:#reporter[reporters] (_SARIF_, _JSON_, _Checkstyle_ XML).
+* Customizable xref:#reporter[reporter] (_SARIF_ or _Checkstyle_ XML).
 
 * Allows multiple xref:#input-paths[input paths]. If you have a multi-module
 project and only wish to check certain directories or modules, you can configure
@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
 ----
 
 == Configuration
@@ -77,15 +77,15 @@ You can override the name or the path of your YAML configuration file using the
 
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           config: path/to/diktat-analysis-custom.yml
 ----
 
 [#reporter]
-=== `reporter`: requesting a custom reporter
+=== `reporter`: requesting a type of reporter
 
-If you wish, you can report errors in a custom format.
+If you wish, you can report errors in a different format.
 
 * Default: `sarif`
 * Required: **no**
@@ -114,35 +114,6 @@ reporter:
 +
 image::checkstyle-xml-reporting.png[Checkstyle-XML reporting assisted by reviewdog]
 
-** `plain`: report errors in the plain-text format, e. g.:
-+
-[source]
-----
-C.kt:1:1: [MISSING_KDOC_TOP_LEVEL] all public and internal top-level classes and functions should have Kdoc: C (cannot be auto-corrected) (diktat-ruleset:kdoc-comments)
-C.kt:1:1: [FILE_NAME_INCORRECT] file name is incorrect - it should end with .kt extension and be in PascalCase: C.kt (diktat-ruleset:file-naming)
-C.kt:1:1: [PACKAGE_NAME_MISSING] no package name declared in a file: C.kt (diktat-ruleset:package-naming)
-C.kt:1:7: [CLASS_NAME_INCORRECT] class/enum/interface name should be in PascalCase and should contain only latin (ASCII) letters or numbers: C (diktat-ruleset:identifier-naming)
-C.kt:1:7: [IDENTIFIER_LENGTH] identifier's length is incorrect, it should be in range of [2, 64] symbols: C (cannot be auto-corrected) (diktat-ruleset:identifier-naming)
-----
-+
-The errors, if any, are printed on the standard output.
-
-** `plain?group_by_file`: same as above, but group errors by file, e. g.:
-+
-[source]
-----
-C.kt
-  1:1 [MISSING_KDOC_TOP_LEVEL] all public and internal top-level classes and functions should have Kdoc: C (cannot be auto-corrected)
-  1:1 [FILE_NAME_INCORRECT] file name is incorrect - it should end with .kt extension and be in PascalCase: C.kt
-  1:1 [PACKAGE_NAME_MISSING] no package name declared in a file: C.kt
-  1:7 [CLASS_NAME_INCORRECT] class/enum/interface name should be in PascalCase and should contain only latin (ASCII) letters or numbers: C
-  1:7 [IDENTIFIER_LENGTH] identifier's length is incorrect, it should be in range of [2, 64] symbols: C (cannot be auto-corrected)
-----
-
-** `json`: report errors in the JSON format to the file named `report.json`.
-
-** `html`: report errors in the HTML format to the file named `report.html`.
-
 [#input-paths]
 === `input-paths`: custom source sets
 
@@ -156,7 +127,7 @@ multiline string to specify multiple inputs.
 +
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           input-paths: |
             path/to/file.kt
@@ -167,7 +138,7 @@ and all `\*.kt` and `*.kts` files are passed to _diKTat_.
 +
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           input-paths: |
             src/main/kotlin
@@ -180,7 +151,7 @@ that match the path pattern. Path patterns may be negated, e. g.:
 +
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           input-paths: |
             **/*.kt
@@ -220,7 +191,7 @@ JDK is not sufficient: you'll need to set **both** `java-distribution` **and**
 
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           java-distribution: 'temurin'
           java-version: 17
@@ -237,7 +208,7 @@ fatal (i.e. the current step terminates with a failure):
 
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           fail-on-error: true
 ----
@@ -245,44 +216,8 @@ fatal (i.e. the current step terminates with a failure):
 [NOTE]
 
 This flag only affects the case when _diKTat_ exits with code **1**. Higher
-link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html#exit-codes[exit
+link:https://diktat.saveourtool.com/diktat-cli/#exit-codes[exit
 codes] are _always_ fatal.
-
-=== `relative-paths`: relative or absolute paths
-
-* Default: `true`
-* Required: **no**
-
-If `true`, file paths get relativized with respect to the project directory.
-Otherwise, absolute file paths get reported. Example:
-
-[source,yaml]
-----
-      - uses: saveourtool/benedikt@v1
-        with:
-          relative-paths: true
-----
-
-[NOTE]
-
-When _SARIF_ xref:#reporter[reporter] is used, this flag has no effect: in
-_SARIF_ mode, paths reported are always absolute.
-
-=== `color`: colorizing the plain-text output
-
-* Default: `true`
-* Required: **no**
-
-Setting this flag enables the console output to be colorized. This is only
-useful if the xref:#reporter[reporter] is set to `plain` or `plain?group_by_file`:
-
-[source,yaml]
-----
-      - uses: saveourtool/benedikt@v1
-        with:
-          reporter: plain
-          color: true
-----
 
 === `debug`: enabling debug logging
 
@@ -293,7 +228,7 @@ Debug logging can be enabled by setting the `debug` input parameter to `true`:
 
 [source,yaml]
 ----
-      - uses: saveourtool/benedikt@v1
+      - uses: saveourtool/benedikt@v2
         with:
           debug: true
 ----
@@ -314,7 +249,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - id: diktat
-        uses: saveourtool/benedikt@v1
+        uses: saveourtool/benedikt@v2
 
       - name: 'Read the exit code of diKTat'
         if: ${{ always() }}
@@ -323,11 +258,4 @@ jobs:
 ----
 
 The exit codes are documented
-link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html#exit-codes[here].
-
-[#diktat-cli]
-== Using the command-line client
-
-Alternatively, if you wish to run _diKTat_ locally (e. g.: as a _Vim_ plug-in),
-or you're using a different CI/CD server, you can try the
-link:https://saveourtool.github.io/benedikt/docs/diktat-cli.html[command-line client].
+link:https://diktat.saveourtool.com/diktat-cli/#exit-codes[here].

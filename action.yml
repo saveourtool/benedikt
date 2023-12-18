@@ -18,8 +18,7 @@ inputs:
     required: false
   reporter:
     description: >
-      The reporter to use, one of: "plain", "plain?group_by_file", "json",
-      "sarif" (the default), "checkstyle", "html".
+      The reporter to use, one of: "sarif" (the default) or "checkstyle".
     default: 'sarif'
     required: false
   input-paths:
@@ -53,21 +52,10 @@ inputs:
       examples of supported syntax at
       <https://github.com/actions/setup-java/blob/main/README.md#supported-version-syntax>.
     required: false
-  color:
-    description: >
-      Colorize the output
-    default: ${{ true }}
-    required: false
   debug:
     description: >
       Whether debug logging should be enabled
     default: ${{ false }}
-    required: false
-  relative-paths:
-    description: >
-      Relativize file paths with respect to the working directory (if false,
-      absolute file paths get reported)
-    default: ${{ true }}
     required: false
   fail-on-error:
     description: >
@@ -105,18 +93,26 @@ runs:
       # `steps.diktat.outputs.exit-code` variable.
     - id: diktat
       run: |
-        DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
-        if [[ '${{ inputs.color }}' != 'false' ]]
-        then
-          DIKTAT_ARGS+=('--color-name')
-        fi
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
-          DIKTAT_ARGS+=('--log-level DEBUG')
+          set -x
         fi
-        if [[ '${{ inputs.relative-paths }}' != 'false' ]]
+        DIKTAT_ARGS=('--config' '${{ inputs.config }}' '--reporter' '${{ inputs.reporter }}')
+        if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
-          DIKTAT_ARGS+=('--relative')
+          report_file=${GITHUB_WORKSPACE}/report.sarif
+        elif [[ '${{ inputs.reporter }}' == 'checkstyle' ]]
+        then
+          report_file=${GITHUB_WORKSPACE}/checkstyle-report.xml
+        else
+          echo "<reporter> should be set to <sarif> or <checkstyle>"
+          exit 1
+        fi
+        DIKTAT_ARGS+=('--output' "${report_file}")
+
+        if [[ '${{ inputs.debug }}' == 'true' ]]
+        then
+          DIKTAT_ARGS+=('--log-level' 'DEBUG')
         fi
 
         set -o pipefail
@@ -125,7 +121,10 @@ runs:
         DIKTAT_CMD=${GITHUB_WORKSPACE}/diktat
         chmod +x ${DIKTAT_CMD}
         { ${DIKTAT_CMD} "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
-        echo "summary-line=$(tail -n1 diktat.log 2>/dev/null)" >>$GITHUB_OUTPUT
+        total_lines=$(wc -l diktat.log | cut -d ' ' -f1)
+        summary_line_number=$(grep -n 'Summary error count (descending) by rule:' diktat.log | cut -d: -f1)
+        summary_line=$(tail -n $((total_lines - summary_line_number)) diktat.log | sed -e 's/^  //g' | awk '{ printf("%s,", $0) }' | sed -e 's/,$//g')
+        echo "summary-line=${summary_line}" >>$GITHUB_OUTPUT
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
       env:
@@ -159,7 +158,7 @@ runs:
         if (( ${{ steps.diktat.outputs.exit-code }} != 0 ))
         then
           echo '```console' >>${GITHUB_STEP_SUMMARY}
-          echo "${{ steps.diktat.outputs.summary-line }}" >>${GITHUB_STEP_SUMMARY}
+          echo "${{ steps.diktat.outputs.summary-line }}" | xargs -d ',' -n1 echo >>${GITHUB_STEP_SUMMARY}
           echo '```' >>${GITHUB_STEP_SUMMARY}
         fi
 
@@ -180,9 +179,9 @@ runs:
       # When in SARIF reporting mode, upload SARIF reports to GitHub.
     - id: upload-sarif
       if: ${{ always() && steps.diktat.outputs.exit-code == 1 && inputs.reporter == 'sarif' }}
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: ${{ github.workspace }}
+        sarif_file: ${{ github.workspace }}/report.sarif
 
       # Alternatively, when in Checkstyle reporting mode, upload Checkstyle XML
       # using `reviewdog`.
@@ -205,7 +204,7 @@ runs:
           reviewdog_reporter='github-check'
         fi
 
-        reviewdog -f=checkstyle -fail-on-error=false -level=info -name='diKTat errors reported by reviewdog' -reporter="${reviewdog_reporter}" <checkstyle-report.xml
+        reviewdog -f=checkstyle -fail-on-error=false -level=info -name='diKTat errors reported by reviewdog' -reporter="${reviewdog_reporter}" <${GITHUB_WORKSPACE}/checkstyle-report.xml
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
