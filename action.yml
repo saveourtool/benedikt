@@ -105,7 +105,7 @@ runs:
         then
           report_file=${GITHUB_WORKSPACE}/checkstyle-report.xml
         else
-          echo "`reporter` should be set to `sarif` or `checkstyle`"
+          echo "<reporter> should be set to <sarif> or <checkstyle>"
           exit 1
         fi
         DIKTAT_ARGS+=('--output' "${report_file}")
