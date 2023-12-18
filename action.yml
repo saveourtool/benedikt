@@ -82,7 +82,7 @@ runs:
       uses: robinraju/release-downloader@v1.8
       with:
         repository: "nulls/diktat"
-        tag: "v2.0.2"
+        tag: "v2.0.3"
         fileName: "diktat"
 
       # GitHub seems to set `-e` internally, so don't fail immediately if diKTat
