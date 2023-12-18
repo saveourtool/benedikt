@@ -96,10 +96,10 @@ runs:
         DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
         if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
-          DIKTAT_ARGS+=('--output report.sarif')
+          DIKTAT_ARGS+=('--output ${GITHUB_WORKSPACE}/report.sarif')
         elif [[ '${{ inputs.reporter }}' == 'checkstyle' ]]
         then
-          DIKTAT_ARGS+=('--output checkstyle-report.xml')
+          DIKTAT_ARGS+=('--output ${GITHUB_WORKSPACE}/checkstyle-report.xml')
         else
           echo "`reporter` should be set to `sarif` or `checkstyle`"
           exit 1
@@ -170,9 +170,9 @@ runs:
       # When in SARIF reporting mode, upload SARIF reports to GitHub.
     - id: upload-sarif
       if: ${{ always() && steps.diktat.outputs.exit-code == 1 && inputs.reporter == 'sarif' }}
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: ${{ github.workspace }}
+        sarif_file: ${GITHUB_WORKSPACE}
 
       # Alternatively, when in Checkstyle reporting mode, upload Checkstyle XML
       # using `reviewdog`.
@@ -195,7 +195,7 @@ runs:
           reviewdog_reporter='github-check'
         fi
 
-        reviewdog -f=checkstyle -fail-on-error=false -level=info -name='diKTat errors reported by reviewdog' -reporter="${reviewdog_reporter}" <checkstyle-report.xml
+        reviewdog -f=checkstyle -fail-on-error=false -level=info -name='diKTat errors reported by reviewdog' -reporter="${reviewdog_reporter}" <${GITHUB_WORKSPACE}/checkstyle-report.xml
       env:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
       shell: bash
