@@ -156,7 +156,7 @@ runs:
         if (( ${{ steps.diktat.outputs.exit-code }} != 0 ))
         then
           echo '```console' >>${GITHUB_STEP_SUMMARY}
-          ${{ steps.diktat.outputs.summary-line }} | xargs -d ',' -n1 echo >>${GITHUB_STEP_SUMMARY}
+          echo "${{ steps.diktat.outputs.summary-line }}" | xargs -d ',' -n1 echo >>${GITHUB_STEP_SUMMARY}
           echo '```' >>${GITHUB_STEP_SUMMARY}
         fi
 
