@@ -94,20 +94,20 @@ runs:
     - id: diktat
       run: |
         set -x
-        DIKTAT_ARGS=('--config', '${{ inputs.config }}', '--reporter', '${{ inputs.reporter }}')
+        DIKTAT_ARGS=('--config' '${{ inputs.config }}' '--reporter' '${{ inputs.reporter }}')
         if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
-          DIKTAT_ARGS+=('--output ${GITHUB_WORKSPACE}/report.sarif')
+          DIKTAT_ARGS+=('--output' '${GITHUB_WORKSPACE}/report.sarif')
         elif [[ '${{ inputs.reporter }}' == 'checkstyle' ]]
         then
-          DIKTAT_ARGS+=('--output ${GITHUB_WORKSPACE}/checkstyle-report.xml')
+          DIKTAT_ARGS+=('--output' '${GITHUB_WORKSPACE}/checkstyle-report.xml')
         else
           echo "`reporter` should be set to `sarif` or `checkstyle`"
           exit 1
         fi
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
-          DIKTAT_ARGS+=('--log-level DEBUG')
+          DIKTAT_ARGS+=('--log-level' 'DEBUG')
         fi
 
         set -o pipefail
