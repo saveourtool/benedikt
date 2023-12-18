@@ -101,15 +101,15 @@ runs:
         if [[ '${{ inputs.reporter }}' == 'sarif' ]]
         then
           report_file=${GITHUB_WORKSPACE}/report.sarif
-          DIKTAT_ARGS+=('--output' report_file)
         elif [[ '${{ inputs.reporter }}' == 'checkstyle' ]]
         then
           report_file=${GITHUB_WORKSPACE}/checkstyle-report.xml
-          DIKTAT_ARGS+=('--output' report_file)
         else
           echo "`reporter` should be set to `sarif` or `checkstyle`"
           exit 1
         fi
+        DIKTAT_ARGS+=('--output' '${report_file}')
+
         if [[ '${{ inputs.debug }}' == 'true' ]]
         then
           DIKTAT_ARGS+=('--log-level' 'DEBUG')
