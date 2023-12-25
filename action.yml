@@ -121,10 +121,13 @@ runs:
         DIKTAT_CMD=${GITHUB_WORKSPACE}/diktat
         chmod +x ${DIKTAT_CMD}
         { ${DIKTAT_CMD} "${DIKTAT_ARGS[@]}" "${INPUT_PATHS[@]}" | tee diktat.log; } && exit_code=$? || exit_code=$?
-        total_lines=$(wc -l diktat.log | cut -d ' ' -f1)
-        summary_line_number=$(grep -n 'Summary error count (descending) by rule:' diktat.log | cut -d: -f1)
-        summary_line=$(tail -n $((total_lines - summary_line_number)) diktat.log | sed -e 's/^  //g' | awk '{ printf("%s,", $0) }' | sed -e 's/,$//g')
-        echo "summary-line=${summary_line}" >>$GITHUB_OUTPUT
+        if (( ${exit_code} != 0 ))
+        then
+          total_lines=$(wc -l diktat.log | cut -d ' ' -f1)
+          summary_line_number=$(grep -n 'Summary error count (descending) by rule:' diktat.log | cut -d: -f1)
+          summary_line=$(tail -n $((total_lines - summary_line_number)) diktat.log | sed -e 's/^  //g' | awk '{ printf("%s,", $0) }' | sed -e 's/,$//g')
+          echo "summary-line=${summary_line}" >>$GITHUB_OUTPUT
+        fi
         rm -f diktat.log
         echo "exit-code=${exit_code}" >>$GITHUB_OUTPUT
       env:
